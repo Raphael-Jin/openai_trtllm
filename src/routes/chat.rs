@@ -213,11 +213,14 @@ async fn chat_completions(
 }
 
 fn build_triton_request(
-    request: ChatCompletionCreateParams,
+    mut request: ChatCompletionCreateParams,
     history_builder: &HistoryBuilder,
 ) -> anyhow::Result<ModelInferRequest> {
     let chat_history = history_builder.build_history(&request.messages)?;
     tracing::debug!("chat history after formatting: {}", chat_history);
+
+    // Force the request model name to be "ensemble"
+    request.model = "ensemble".to_string();
 
     let mut builder = Builder::new()
         .model_name(request.model)
