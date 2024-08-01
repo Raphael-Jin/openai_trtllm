@@ -279,6 +279,14 @@ fn build_triton_request(
         );
     }
 
+    if request.repetition_penalty.is_some() {
+        builder = builder.input(
+            "repetition_penalty",
+            [1, 1],
+            InferTensorData::FP32(vec![request.repetition_penalty.unwrap()]),
+        );
+    }
+
     builder.build().context("failed to build triton request")
 }
 
@@ -306,6 +314,7 @@ pub(crate) struct ChatCompletionCreateParams {
     /// appear in the text so far, increasing the model's likelihood to talk about new topics.
     #[serde(default = "default_presence_penalty")]
     presence_penalty: f32,
+    repetition_penalty: Option<f32>,
     /// An object specifying the format that the model must output.
     /// Setting to { "type": "json_object" } enables JSON mode, which guarantees the message the
     /// model generates is valid JSON.

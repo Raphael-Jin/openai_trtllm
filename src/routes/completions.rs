@@ -260,6 +260,14 @@ fn build_triton_request(request: CompletionCreateParams) -> anyhow::Result<Model
         );
     }
 
+    if request.repetition_penalty.is_some() {
+        builder = builder.input(
+            "repetition_penalty",
+            [1, 1],
+            InferTensorData::FP32(vec![request.repetition_penalty.unwrap()]),
+        );
+    }
+
     builder.build().context("failed to build triton request")
 }
 
@@ -298,6 +306,7 @@ pub(crate) struct CompletionCreateParams {
     /// appear in the text so far, increasing the model's likelihood to talk about new topics.
     #[serde(default = "default_presence_penalty")]
     presence_penalty: f32,
+    repetition_penalty: Option<f32>,
     /// If specified, our system will make a best effort to sample deterministically, such that
     /// repeated requests with the same seed and parameters should return the same result.
     seed: Option<usize>,
